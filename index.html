@@ -1,4 +1,72 @@
 <!doctype html>
+<style>
+    body {
+        font-family: Helvetica;
+    }
+    #din_a4 {
+        padding: 50px;
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        font-size: 12pt;
+        line-height: 1.5;
+        border: 1px solid #ccc;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    form {
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px auto;
+        max-width: 400px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    textarea {
+        width: 100%;
+        margin: 8px 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        resize: vertical;
+        font-family: inherit;
+    }
+
+    label {
+        font-weight: bold;
+        color: #444;
+    }
+
+    input[type="button"] {
+        background: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 10px;
+    }
+
+    input[type="button"]:hover {
+        background: #0056b3;
+    }
+
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        #anschreiben,
+        #anschreiben * {
+            visibility: visible;
+            font-size: 10pt;
+        }
+        #anschreiben {
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+    }
+</style>
 <html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
     <head>
         <meta charset="utf-8" />
@@ -18,63 +86,93 @@
         ></script>
 
         <script>
-
-
             function generatePDF() {
                 var opt = {
                     margin: 10,
                     filename: "Widerspruch Betriebskosten",
-                    image: { type: "jpeg", quality: 1 },
+                    image: { type: "png", quality: 1 },
                     jsPDF: {
                         unit: "mm",
                         format: "a4",
                         orientation: "portrait",
                     },
+                    html2canvas: { scale: 2 },
                     pagebreak: { mode: ["avoid-all", "css"] },
                 };
+
                 html2pdf()
-                    .from(document.getElementById("foobar"))
+                    .from(document.getElementById("anschreiben"))
                     .set(opt)
                     .save();
-                console.log('Example URL: ?mietend=' + encodeURIComponent(adresse_mietend) + '&vermietend=' + encodeURIComponent(adresse_vermieter) + '&direct=0');
-
+                console.log(
+                    "Example URL: ?mietend=" +
+                        encodeURIComponent(adresse_mietend) +
+                        "&vermietend=" +
+                        encodeURIComponent(adresse_vermieter) +
+                        "&direct=0",
+                );
             }
         </script>
         <center>
             <form>
-                <label for="vermieter">Vermieter Addresse:</label><br>
-                <textarea id="vermieter_input" rows="4" cols="50" onkeyup="updateVermieter(this.value)"></textarea><br><br>
-                <label for="mieter">Mieter Addresse:</label><br>
-                <textarea id="mieter_input" rows="4" cols="50" onkeyup="updateMieter(this.value)"></textarea>
+                <label for="mieter">Mieter Addresse:</label><br />
+                <textarea
+                    id="mieter_input"
+                    rows="4"
+                    cols="50"
+                    onkeyup="updateMieter(this.value)"
+                ></textarea>
+                <br /><br />
+                <label for="vermieter">Vermieter Addresse:</label><br />
+                <textarea
+                    id="vermieter_input"
+                    rows="4"
+                    cols="50"
+                    onkeyup="updateVermieter(this.value)"
+                ></textarea>
             </form>
-            <input type="button" value="Create PDF" onclick="generatePDF()" />
-
+            <input
+                type="button"
+                value="PDF Herunterladen"
+                onclick="generatePDF()"
+            />
+            <input type="button" value="Drucken" onclick="window.print()" />
         </center>
+
+        <br />
 
         <script>
             function updateVermieter(value) {
                 adresse_vermieter = value;
-                document.getElementById("adresse_vermieter").innerHTML = adresse_vermieter;
+                document.getElementById("adresse_vermieter").innerHTML =
+                    adresse_vermieter;
             }
 
             function updateMieter(value) {
                 adresse_mietend = value;
                 document.getElementById("adresse_mietend").innerHTML = value;
-                document.getElementById("name_mietend").innerHTML = value.split("\n")[0];
+                document.getElementById("name_mietend").innerHTML =
+                    value.split("\n")[0];
             }
         </script>
 
-        <div id="foobar">
-            <div>
+        <div id="din_a4">
+            <div id="anschreiben">
                 <p style="white-space: pre-line">
-                    <span id="adresse_vermieter"></span>
-            </div>
-                <p style="white-space: pre-line">
+                    Absender:
                     <span id="adresse_mietend"></span>
                 </p>
+
+                <p style="white-space: pre-line">
+                    An:
+                    <span id="adresse_vermieter"></span>
+                </p>
+                <br />
+                <br />
+                <br />
                 <strong>Betreff Kürzung Heiz- und Nebenkosten</strong>
                 <p>
-                    <span id="today_string" style="float:right;"></span>
+                    <span id="today_string" style="float: right"></span>
                 </p>
                 <br />
                 <br />
@@ -87,93 +185,95 @@
                     Heizkostenrechnung in folgenden Punkten:
                 </p>
                 <p>
-                    Gemäß § 9 der Heizkostenverordnung hat die Trennung der Kosten für
-                    Warmwasserbereitung und Heizung mit Wärmezählern zu erfolgen. Die in
-                    der Abrechnung verwendete Kostentrennung mit Formel nach Abs. (2)
-                    HeizkostenV ist seit 2014 nicht mehr zulässig und eine
-                    verbrauchsgenaue Abrechnung damit nicht erfolgt. Nach § 12 der
-                    Heizkostenverordnung mache ich deshalb vom Recht auf Kürzung der
-                    Heiz- und Wassererwärmungskosten von 15% Gebrauch.
+                    Gemäß § 9 der Heizkostenverordnung hat die Trennung der
+                    Kosten für Warmwasserbereitung und Heizung mit Wärmezählern
+                    zu erfolgen. Die in der Abrechnung verwendete Kostentrennung
+                    mit Formel nach Abs. (2) HeizkostenV ist seit 2014 nicht
+                    mehr zulässig und eine verbrauchsgenaue Abrechnung damit
+                    nicht erfolgt. Nach § 12 der Heizkostenverordnung mache ich
+                    deshalb vom Recht auf Kürzung der Heiz- und
+                    Wassererwärmungskosten von 15% Gebrauch.
                 </p>
                 <p>
-                    Zusätzlich mache ich von meinem Recht Gebrauch, aufgrund fehlender
-                    unterjähriger Verbrauchsinformationen (UVI) weitere 3% der Kosten zu
-                    kürzen.
+                    Zusätzlich mache ich von meinem Recht Gebrauch, aufgrund
+                    fehlender unterjähriger Verbrauchsinformationen (UVI)
+                    weitere 3% der Kosten zu kürzen.
                 </p>
                 <p>
-                    Ich fordere Sie auf, meine Rückforderung bis <span id="in_30_days"></span> zu
-                    erstatten.
+                    Ich fordere Sie auf, meine Rückforderung bis
+                    <span id="in_30_days"></span> zu erstatten.
                 </p>
-                <p>Mit freundlichen Grüßen</p>
+                <p>Mit freundlichen Grüßen,</p>
                 <p id="name_mietend"></p>
 
-                <p style="text-align:left;">
+                <p style="text-align: left">
                     ________________________
-                    <span style="float:right;">
-                        ________________________
-                    </span>
+                    <span style="float: right"> ________________________ </span>
                 </p>
-                <p style="text-align:left;">
+                <p style="text-align: left">
                     Ort und Datum
-                    <span style="float:right;">
-                        Unterschrift
-                    </span>
+                    <span style="float: right"> Unterschrift </span>
                 </p>
             </div>
         </div>
+
         <script>
-        adresse_mietend = `Max Mustermann
+            adresse_mietend = `Max Mustermann
           Musterstraße 1
           12345 Musterstadt`;
 
-        adresse_vermieter = `Vermieter GmbH
+            adresse_vermieter = `Vermieter GmbH
           Musterstraße 2
           12345 Musterstadt`;
 
-        const today = new Date();
-        const today_string =
-            today.getDate() +
-            "." +
-            (today.getMonth() + 1) +
-            "." +
-            today.getFullYear();
-        today.setDate(today.getDate() + 30);
-        const in_30_days_string =
-            today.getDate() +
-            "." +
-            (today.getMonth() + 1) +
-            "." +
-            today.getFullYear();
+            const today = new Date();
+            const today_string =
+                today.getDate() +
+                "." +
+                (today.getMonth() + 1) +
+                "." +
+                today.getFullYear();
+            today.setDate(today.getDate() + 30);
+            const in_30_days_string =
+                today.getDate() +
+                "." +
+                (today.getMonth() + 1) +
+                "." +
+                today.getFullYear();
 
-        document.getElementById("adresse_vermieter").innerHTML = adresse_vermieter;
-        document.getElementById("adresse_mietend").innerHTML = adresse_mietend;
-        document.getElementById("today_string").innerHTML = today_string;
-        document.getElementById("in_30_days").innerHTML = in_30_days_string;
-        document.getElementById("name_mietend").innerHTML = adresse_mietend.split("\n")[0];
+            document.getElementById("adresse_vermieter").innerHTML =
+                adresse_vermieter;
+            document.getElementById("adresse_mietend").innerHTML =
+                adresse_mietend;
+            document.getElementById("today_string").innerHTML = today_string;
+            document.getElementById("in_30_days").innerHTML = in_30_days_string;
+            document.getElementById("name_mietend").innerHTML =
+                adresse_mietend.split("\n")[0];
         </script>
 
         <script>
             const urlParams = new URLSearchParams(window.location.search);
-            const mietend = urlParams.get('mietend');
-            const vermietend = urlParams.get('vermietend');
-            const direct = urlParams.get('direct');
+            const mietend = urlParams.get("mietend");
+            const vermietend = urlParams.get("vermietend");
+            const direct = urlParams.get("direct");
 
             if (mietend) {
                 adresse_mietend = decodeURIComponent(mietend);
-                document.getElementById("adresse_mietend").innerHTML = adresse_mietend;
-                document.getElementById("name_mietend").innerHTML = adresse_mietend.split("\n")[0];
+                document.getElementById("adresse_mietend").innerHTML =
+                    adresse_mietend;
+                document.getElementById("name_mietend").innerHTML =
+                    adresse_mietend.split("\n")[0];
             }
 
             if (vermietend) {
                 adresse_vermieter = decodeURIComponent(vermietend);
-                document.getElementById("adresse_vermieter").innerHTML = adresse_vermieter;
+                document.getElementById("adresse_vermieter").innerHTML =
+                    adresse_vermieter;
             }
 
-            if (direct === '1') {
+            if (direct === "1") {
                 generatePDF();
             }
-
         </script>
-
     </body>
 </html>
