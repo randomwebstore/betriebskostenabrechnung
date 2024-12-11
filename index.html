@@ -62,40 +62,28 @@
                 font-size: 10pt;
             }
         </style>
-        <script
-            src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
-            integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"
-        ></script>
+        <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+        <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     </head>
     <body class="A4">
         <script>
+            window.jsPDF = window.jspdf.jsPDF;
             function generatePDF() {
-                var opt = {
-                    margin: 10,
-                    filename: "Widerspruch Betriebskosten",
-                    image: { type: "png", quality: 1 },
-                    jsPDF: {
-                        unit: "mm",
-                        format: "a4",
-                        orientation: "portrait",
-                    },
-                    html2canvas: { scale: 2 },
-                    pagebreak: { mode: ["avoid-all", "css"] },
-                };
+                const doc = new jsPDF("p", "pt", "a4");
+                doc.html(document.getElementById("anschreiben"), {
+                    margin: [40, 40, 40, 40],
 
-                html2pdf()
-                    .from(document.getElementById("anschreiben"))
-                    .set(opt)
-                    .save();
-                console.log(
-                    "Example URL: ?mietend=" +
-                        encodeURIComponent(adresse_mietend) +
-                        "&vermietend=" +
-                        encodeURIComponent(adresse_vermieter) +
-                        "&direct=0",
-                );
+                    html2canvas: {
+                        allowTaint: true,
+                        dpi: 300,
+                        letterRendering: true,
+                        logging: false,
+                        scale: 0.7,
+                    },
+                    callback: function (doc) {
+                        doc.save("Widerspruch Betriebskosten.pdf");
+                    },
+                });
             }
         </script>
         <center>
