@@ -1,72 +1,4 @@
 <!doctype html>
-<style>
-    body {
-        font-family: Helvetica;
-    }
-    #din_a4 {
-        padding: 50px;
-        max-width: 800px;
-        margin: 0 auto;
-        background: white;
-        font-size: 12pt;
-        line-height: 1.5;
-        border: 1px solid #ccc;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    form {
-        background: #f9f9f9;
-        padding: 20px;
-        border-radius: 8px;
-        margin: 20px auto;
-        max-width: 400px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-
-    textarea {
-        width: 100%;
-        margin: 8px 0;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        resize: vertical;
-        font-family: inherit;
-    }
-
-    label {
-        font-weight: bold;
-        color: #444;
-    }
-
-    input[type="button"] {
-        background: #007bff;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 16px;
-        margin-top: 10px;
-    }
-
-    input[type="button"]:hover {
-        background: #0056b3;
-    }
-
-    @media print {
-        body * {
-            visibility: hidden;
-        }
-        #anschreiben,
-        #anschreiben * {
-            visibility: visible;
-            font-size: 10pt;
-        }
-        #anschreiben {
-            position: absolute;
-            left: 0;
-            top: 0;
-        }
-    }
-</style>
 <html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
     <head>
         <meta charset="utf-8" />
@@ -76,15 +8,68 @@
             content="width=device-width, initial-scale=1.0, user-scalable=yes"
         />
         <title>Anschreiben</title>
-    </head>
-    <body>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/paper-css/0.3.0/paper.css"
+        />
+
+        <style>
+            body {
+                font-family: Helvetica;
+            }
+            #din_a4 {
+                margin: auto;
+            }
+            form {
+                background: #f9f9f9;
+                padding: 20px;
+                border-radius: 8px;
+                margin: 20px auto;
+                max-width: 400px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+
+            textarea {
+                width: 100%;
+                margin: 8px 0;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                resize: vertical;
+                font-family: inherit;
+            }
+
+            label {
+                font-weight: bold;
+                color: #444;
+            }
+
+            input[type="button"] {
+                background: #007bff;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 16px;
+                margin-top: 10px;
+            }
+
+            input[type="button"]:hover {
+                background: #0056b3;
+            }
+
+            #anschreiben {
+                font-size: 10pt;
+            }
+        </style>
         <script
             src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
             integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
             crossorigin="anonymous"
             referrerpolicy="no-referrer"
         ></script>
-
+    </head>
+    <body class="A4">
         <script>
             function generatePDF() {
                 var opt = {
@@ -136,27 +121,11 @@
                 value="PDF Herunterladen"
                 onclick="generatePDF()"
             />
-            <input type="button" value="Drucken" onclick="window.print()" />
         </center>
 
         <br />
 
-        <script>
-            function updateVermieter(value) {
-                adresse_vermieter = value;
-                document.getElementById("adresse_vermieter").innerHTML =
-                    adresse_vermieter;
-            }
-
-            function updateMieter(value) {
-                adresse_mietend = value;
-                document.getElementById("adresse_mietend").innerHTML = value;
-                document.getElementById("name_mietend").innerHTML =
-                    value.split("\n")[0];
-            }
-        </script>
-
-        <div id="din_a4">
+        <section class="sheet padding-10mm" id="din_a4">
             <div id="anschreiben">
                 <p style="white-space: pre-line">
                     Absender:
@@ -210,9 +179,22 @@
                     <span style="float: right"> Unterschrift </span>
                 </p>
             </div>
-        </div>
+        </section>
 
         <script>
+            function updateVermieter(value) {
+                adresse_vermieter = value;
+                document.getElementById("adresse_vermieter").innerHTML =
+                    adresse_vermieter;
+            }
+
+            function updateMieter(value) {
+                adresse_mietend = value;
+                document.getElementById("adresse_mietend").innerHTML = value;
+                document.getElementById("name_mietend").innerHTML =
+                    value.split("\n")[0];
+            }
+
             adresse_mietend = `Max Mustermann
           Musterstraße 1
           12345 Musterstadt`;
@@ -244,9 +226,7 @@
             document.getElementById("in_30_days").innerHTML = in_30_days_string;
             document.getElementById("name_mietend").innerHTML =
                 adresse_mietend.split("\n")[0];
-        </script>
 
-        <script>
             const urlParams = new URLSearchParams(window.location.search);
             const mietend = urlParams.get("mietend");
             const vermietend = urlParams.get("vermietend");
