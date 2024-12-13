@@ -81,7 +81,9 @@
                         scale: 0.7,
                     },
                     callback: function (doc) {
-                        doc.save("Widerspruch Betriebskosten.pdf");
+                        doc.save(
+                            `Widerspruch Betriebskosten ${slugify(document.getElementById("name_mietend").innerText)}.pdf`,
+                        );
                     },
                 });
             }
@@ -197,6 +199,15 @@
         </section>
 
         <script>
+            // from https://dev.to/bybydev/how-to-slugify-a-string-in-javascript-4o9n
+            function slugify(str) {
+                str = str.replace(/^\s+|\s+$/g, ""); // trim leading/trailing white space
+                str = str
+                    .replace(/[^A-Za-z0-9 -]/g, "") // remove any non-alphanumeric characters
+                    .replace(/-+/g, "-"); // remove consecutive hyphens
+                return str;
+            }
+
             function updateVermieter(value) {
                 adresse_vermieter = value;
                 document.getElementById("adresse_vermieter").innerHTML =
