@@ -95,7 +95,7 @@
                     cols="50"
                     onkeyup="updateMieter(this.value)"
                 ></textarea>
-                <br /><br />
+                <br />
                 <label for="vermieter">Vermieter Addresse:</label><br />
                 <textarea
                     id="vermieter_input"
@@ -103,6 +103,27 @@
                     cols="50"
                     onkeyup="updateVermieter(this.value)"
                 ></textarea>
+
+                <br />
+                <label for="ansprache">Ansprache:</label><br />
+                <select
+                    id="ansprache_input"
+                    onchange="updateAnsprache(this.value)"
+                >
+                    <option value="Sehr geehrte Damen und Herren">
+                        Sehr geehrte Damen und Herren
+                    </option>
+                    <option value="Sehr geehrter Herr">
+                        Sehr geehrter Herr
+                    </option>
+                    <option value="Sehr geehrte Frau">Sehr geehrte Frau</option>
+                </select>
+                <input
+                    type="text"
+                    id="vermieter_name_input"
+                    onkeyup="updateVermieterName(this.value)"
+                    placeholder="Name Vermieter"
+                />
             </form>
             <input
                 type="button"
@@ -136,7 +157,11 @@
                 <br />
                 <br />
                 <p style="white-space: pre-line" id="haupt_text"></p>
-                <p>Sehr geehrte Damen und Herren,</p>
+                <p>
+                    <span id="ansprache">Sehr geehrte Damen und Herren</span
+                    ><span id="name_vermietend"></span>,
+                </p>
+
                 <p>
                     hiermit widerspreche ich der letzten Betriebs- und
                     Heizkostenrechnung in folgenden Punkten:
@@ -157,7 +182,9 @@
                 </p>
                 <p>Mit freundlichen Grüßen,</p>
                 <p id="name_mietend"></p>
-
+                <br />
+                <br />
+                <br />
                 <p style="text-align: left">
                     ________________________
                     <span style="float: right"> ________________________ </span>
@@ -183,7 +210,16 @@
                     value.split("\n")[0];
             }
 
-            adresse_mietend = `Max Mustermann
+            function updateAnsprache(value) {
+                document.getElementById("ansprache").innerHTML = value;
+            }
+
+            function updateVermieterName(value) {
+                document.getElementById("name_vermietend").innerHTML =
+                    " " + value;
+            }
+
+            adresse_mietend = `Name Mieter
           Musterstraße 1
           12345 Musterstadt`;
 
