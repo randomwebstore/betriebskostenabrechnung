@@ -61,14 +61,100 @@
             #anschreiben {
                 font-size: 10pt;
             }
+
+            #results {
+                font-size: 10pt;
+            }
         </style>
         <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
         <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     </head>
     <body class="A4">
         <script>
+            let osm_item = null;
+
+            var delayTimer;
+            async function doSearch(value) {
+                const resultsDiv = document.getElementById("results");
+
+                resultsDiv.innerHTML = "🔍";
+
+                clearTimeout(delayTimer);
+                delayTimer = setTimeout(search.bind(null, value), 1000);
+            }
+
+            async function search(query) {
+                console.log("Searching " + query);
+                const resultsDiv = document.getElementById("results");
+
+                // resultsDiv.innerHTML = "";
+
+                if (!query) {
+                    return;
+                }
+
+                try {
+                    const targetUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+                        query,
+                    )}&format=json&addressdetails=1&limit=5`;
+                    const response = await fetch(targetUrl);
+
+                    if (!response.ok) {
+                        console.error(
+                            "Error fetching data:",
+                            response.statusText,
+                        );
+                        return;
+                    }
+
+                    const data = await response.json();
+                    if (data.length == 1) {
+                        osm_item = data[0];
+                        const address = osm_item.address;
+                        document.getElementById("mietend_adresse").innerText =
+                            address.road +
+                            " " +
+                            address.house_number +
+                            "\n" +
+                            address.postcode +
+                            " " +
+                            address.city;
+                        resultsDiv.innerHTML = "✅";
+                    } else {
+                        resultsDiv.innerHTML = "❓";
+
+                        data.forEach((item) => {
+                            console.log(item);
+                            const div = document.createElement("li");
+                            div.className = "result-item";
+                            div.textContent = `${item.display_name}`;
+                            resultsDiv.appendChild(div);
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                }
+            }
+        </script>
+        <script>
             window.jsPDF = window.jspdf.jsPDF;
-            function generatePDF() {
+            function generate_pdf() {
+                fetch("/location", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        lat: parseFloat(osm_item.lat),
+                        lon: parseFloat(osm_item.lon),
+                        address: osm_item.display_name,
+                        house_number: osm_item.address.house_number,
+                        street: osm_item.address.road,
+                        city: osm_item.address.city,
+                        postcode: osm_item.address.postcode,
+                    }),
+                });
+
                 const doc = new jsPDF("p", "pt", "a4");
                 doc.html(document.getElementById("anschreiben"), {
                     margin: [40, 40, 40, 40],
@@ -82,7 +168,7 @@
                     },
                     callback: function (doc) {
                         doc.save(
-                            `Widerspruch Betriebskosten ${slugify(document.getElementById("name_mietend").innerText)}.pdf`,
+                            `Widerspruch Betriebskosten ${slugify(document.getElementById("mietend_name").innerText)}.pdf`,
                         );
                     },
                 });
@@ -90,27 +176,37 @@
         </script>
         <center>
             <form>
-                <label for="mieter">Mieter Addresse:</label><br />
+                <label for="mieter">Mieter:in Addresse:</label><br />
                 <textarea
                     id="mieter_input"
                     rows="4"
                     cols="50"
-                    onkeyup="updateMieter(this.value)"
+                    onkeyup="update_mietend(this.value)"
                 ></textarea>
+                <label for="search"
+                    >Adresse suchen und in Datenbank eintragen</label
+                >
+                <input
+                    type="checkbox"
+                    id="search_address"
+                    name="search_address"
+                    checked
+                />
+                <ul id="results"></ul>
                 <br />
-                <label for="vermieter">Vermieter Addresse:</label><br />
+                <label for="vermieter">Vermieter:in Addresse:</label><br />
                 <textarea
                     id="vermieter_input"
                     rows="4"
                     cols="50"
-                    onkeyup="updateVermieter(this.value)"
+                    onkeyup="update_vermietend(this.value)"
                 ></textarea>
 
                 <br />
                 <label for="ansprache">Ansprache:</label><br />
                 <select
                     id="ansprache_input"
-                    onchange="updateAnsprache(this.value)"
+                    onchange="update_ansprache(this.value)"
                 >
                     <option value="Sehr geehrte Damen und Herren">
                         Sehr geehrte Damen und Herren
@@ -123,14 +219,14 @@
                 <input
                     type="text"
                     id="vermieter_name_input"
-                    onkeyup="updateVermieterName(this.value)"
+                    onkeyup="update_vermietend_name(this.value)"
                     placeholder="Name Vermieter"
                 />
             </form>
             <input
                 type="button"
                 value="PDF Herunterladen"
-                onclick="generatePDF()"
+                onclick="generate_pdf()"
             />
         </center>
 
@@ -140,11 +236,13 @@
             <div id="anschreiben">
                 <p style="white-space: pre-line">
                     Absender:
-                    <span id="adresse_mietend"></span>
+                    <span id="mietend_name_anschrift"></span>
+                    <span id="mietend_adresse"></span>
                 </p>
 
                 <p style="white-space: pre-line">
                     An:
+                    <span id="name_vermietend_anschrift"></span>
                     <span id="adresse_vermieter"></span>
                 </p>
                 <br />
@@ -161,7 +259,7 @@
                 <p style="white-space: pre-line" id="haupt_text"></p>
                 <p>
                     <span id="ansprache">Sehr geehrte Damen und Herren</span
-                    ><span id="name_vermietend"></span>,
+                    ><span id="name_vermietend_ansprache"></span>,
                 </p>
 
                 <p>
@@ -184,7 +282,7 @@
                     <span id="in_30_days"></span> zu erstatten.
                 </p>
                 <p>Mit freundlichen Grüßen,</p>
-                <p id="name_mietend"></p>
+                <p id="mietend_name"></p>
                 <br />
                 <br />
                 <br />
@@ -216,35 +314,36 @@
                 return str;
             }
 
-            function updateVermieter(value) {
+            function update_vermietend(value) {
                 adresse_vermieter = value;
                 document.getElementById("adresse_vermieter").innerHTML =
                     adresse_vermieter;
             }
 
-            function updateMieter(value) {
-                adresse_mietend = value;
-                document.getElementById("adresse_mietend").innerHTML = value;
-                document.getElementById("name_mietend").innerHTML =
-                    value.split("\n")[0];
+            function update_mietend(mietend) {
+                mietend = mietend.split("\n");
+                document.getElementById("mietend_name_anschrift").innerHTML =
+                    mietend[0];
+                document.getElementById("mietend_name").innerHTML = mietend[0];
+                if (mietend.length > 1) {
+                    document.getElementById("mietend_adresse").innerHTML =
+                        mietend.slice(1).join("\n");
+                    if (document.getElementById("search_address").checked) {
+                        doSearch(mietend.slice(1).join(" "));
+                    }
+                }
             }
 
-            function updateAnsprache(value) {
+            function update_ansprache(value) {
                 document.getElementById("ansprache").innerHTML = value;
             }
 
-            function updateVermieterName(value) {
-                document.getElementById("name_vermietend").innerHTML =
+            function update_vermietend_name(value) {
+                document.getElementById("name_vermietend_ansprache").innerHTML =
+                    " " + value;
+                document.getElementById("name_vermietend_anschrift").innerHTML =
                     " " + value;
             }
-
-            adresse_mietend = `Name Mieter
-          Musterstraße 1
-          12345 Musterstadt`;
-
-            adresse_vermieter = `Vermieter GmbH
-          Musterstraße 2
-          12345 Musterstadt`;
 
             const today = new Date();
             const today_string =
@@ -261,37 +360,8 @@
                 "." +
                 today.getFullYear();
 
-            document.getElementById("adresse_vermieter").innerHTML =
-                adresse_vermieter;
-            document.getElementById("adresse_mietend").innerHTML =
-                adresse_mietend;
             document.getElementById("today_string").innerHTML = today_string;
             document.getElementById("in_30_days").innerHTML = in_30_days_string;
-            document.getElementById("name_mietend").innerHTML =
-                adresse_mietend.split("\n")[0];
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const mietend = urlParams.get("mietend");
-            const vermietend = urlParams.get("vermietend");
-            const direct = urlParams.get("direct");
-
-            if (mietend) {
-                adresse_mietend = decodeURIComponent(mietend);
-                document.getElementById("adresse_mietend").innerHTML =
-                    adresse_mietend;
-                document.getElementById("name_mietend").innerHTML =
-                    adresse_mietend.split("\n")[0];
-            }
-
-            if (vermietend) {
-                adresse_vermieter = decodeURIComponent(vermietend);
-                document.getElementById("adresse_vermieter").innerHTML =
-                    adresse_vermieter;
-            }
-
-            if (direct === "1") {
-                generatePDF();
-            }
         </script>
     </body>
 </html>

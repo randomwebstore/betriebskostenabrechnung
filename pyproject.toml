@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "betriebskosten"
+version = "0.1.0"
+description = ""
+authors = ["Bronko <dusty-pillage-2e@icloud.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+requests = "^2.32.3"
+fastapi = {extras = ["standard"], version = "^0.115.6"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
