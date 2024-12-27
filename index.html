@@ -71,6 +71,10 @@
     </head>
     <body class="A4">
         <script>
+            function item2address(item) {
+                const address = item.address;
+                return `${address.road} ${address.house_number}\n${address.postcode} ${address.city || address.village}`;
+            }
             let osm_item = null;
 
             var delayTimer;
@@ -112,13 +116,8 @@
                         osm_item = data[0];
                         const address = osm_item.address;
                         document.getElementById("mietend_adresse").innerText =
-                            address.road +
-                            " " +
-                            address.house_number +
-                            "\n" +
-                            address.postcode +
-                            " " +
-                            address.city;
+                            item2address(osm_item);
+
                         resultsDiv.innerHTML = "✅";
                     } else {
                         resultsDiv.innerHTML = "❓";
@@ -128,6 +127,22 @@
                             const div = document.createElement("li");
                             div.className = "result-item";
                             div.textContent = `${item.display_name}`;
+                            div.onclick = () => {
+                                osm_item = item;
+                                const name = document
+                                    .getElementById("mieter_input")
+                                    .value.split("\n")[0];
+                                document.getElementById(
+                                    "mietend_name_anschrift",
+                                ).innerHTML = name;
+                                document.getElementById(
+                                    "mietend_name",
+                                ).innerHTML = name;
+                                document.getElementById(
+                                    "mietend_adresse",
+                                ).innerHTML = item2address(item);
+                                resultsDiv.innerHTML = "✅";
+                            };
                             resultsDiv.appendChild(div);
                         });
                     }
@@ -168,7 +183,7 @@
                         address: osm_item.display_name,
                         house_number: osm_item.address.house_number,
                         street: osm_item.address.road,
-                        city: osm_item.address.city,
+                        city: osm_item.address.city || osm_item.address.village,
                         postcode: osm_item.address.postcode,
                     }),
                 });
