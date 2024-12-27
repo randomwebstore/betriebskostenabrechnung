@@ -65,6 +65,11 @@
             #results {
                 font-size: 10pt;
             }
+
+            .result-item:hover {
+                background: #f0f0f0;
+                cursor: pointer;
+            }
         </style>
         <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
         <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
@@ -196,7 +201,7 @@
                     id="mieter_input"
                     rows="4"
                     cols="50"
-                    onkeyup="update_mietend(this.value)"
+                    onkeyup="update_mietend()"
                 ></textarea>
                 <label for="search"
                     >Adresse suchen und in Datenbank eintragen</label
@@ -205,6 +210,7 @@
                     type="checkbox"
                     id="search_address"
                     name="search_address"
+                    onchange="update_mietend()"
                     checked
                 />
                 <ul id="results"></ul>
@@ -335,8 +341,10 @@
                     adresse_vermieter;
             }
 
-            function update_mietend(mietend) {
-                mietend = mietend.split("\n");
+            function update_mietend() {
+                const mietend = document
+                    .getElementById("mieter_input")
+                    .value.split("\n");
                 document.getElementById("mietend_name_anschrift").innerHTML =
                     mietend[0];
                 document.getElementById("mietend_name").innerHTML = mietend[0];
