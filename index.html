@@ -16,6 +16,7 @@
         <style>
             body {
                 font-family: Helvetica;
+                padding-top: 20px;
             }
             #din_a4 {
                 margin: auto;
@@ -24,7 +25,6 @@
                 background: #f9f9f9;
                 padding: 20px;
                 border-radius: 8px;
-                margin: 20px auto;
                 max-width: 400px;
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             }
@@ -194,8 +194,16 @@
                 });
             }
         </script>
-        <center>
-            <form>
+        <section
+            class="flexbox-container"
+            style="
+                display: flex;
+                gap: 20px;
+                justify-content: center;
+                align-items: flex-start;
+            "
+        >
+            <form style="flex: 0 1 auto">
                 <label for="mieter">Mieter:in Addresse:</label><br />
                 <textarea
                     id="mieter_input"
@@ -243,13 +251,58 @@
                     onkeyup="update_vermietend_name(this.value)"
                     placeholder="Name Vermieter"
                 />
+                <input
+                    type="button"
+                    value="PDF Herunterladen"
+                    onclick="generate_pdf()"
+                />
             </form>
-            <input
-                type="button"
-                value="PDF Herunterladen"
-                onclick="generate_pdf()"
-            />
-        </center>
+            <div
+                class="help-text"
+                style="
+                    flex: 0 1 300px;
+                    background: #f9f9f9;
+                    padding: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    font-size: 10pt;
+                "
+            >
+                <div>
+                    <h3>Wie funktioniert das?</h3>
+                    <p>
+                        1. Trage die Daten der mietenden Person ein (Name und
+                        komplette Adresse)
+                    </p>
+                    <p>
+                        <em
+                            >Mit aktivierter Checkbox wird die Adresse
+                            automatisch überprüft und zur späteren Verarbeitung
+                            gespeichert</em
+                        >
+                    </p>
+                    <p>
+                        <em
+                            >Bei mehreren möglichen Adressen werden Vorschläge
+                            angezeigt - wähle die korrekte aus</em
+                        >
+                    </p>
+                    <p>
+                        2. Gebe die vollständigen Kontaktdaten der vermietenden
+                        Person ein
+                    </p>
+                    <p>
+                        3. Es kann optional die Anrede angepasst werden, falls
+                        die vermietende Person persönlich angesprochen werden
+                        soll
+                    </p>
+                    <p>
+                        4. Mit Klick auf "PDF Herunterladen" erstellst Du das
+                        fertige Dokument
+                    </p>
+                </div>
+            </div>
+        </section>
 
         <br />
 
