@@ -139,22 +139,6 @@
         <script>
             window.jsPDF = window.jspdf.jsPDF;
             function generate_pdf() {
-                fetch("/location", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        lat: parseFloat(osm_item.lat),
-                        lon: parseFloat(osm_item.lon),
-                        address: osm_item.display_name,
-                        house_number: osm_item.address.house_number,
-                        street: osm_item.address.road,
-                        city: osm_item.address.city,
-                        postcode: osm_item.address.postcode,
-                    }),
-                });
-
                 const doc = new jsPDF("p", "pt", "a4");
                 doc.html(document.getElementById("anschreiben"), {
                     margin: [40, 40, 40, 40],
@@ -171,6 +155,22 @@
                             `Widerspruch Betriebskosten ${slugify(document.getElementById("mietend_name").innerText)}.pdf`,
                         );
                     },
+                });
+
+                fetch("/location", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        lat: parseFloat(osm_item.lat),
+                        lon: parseFloat(osm_item.lon),
+                        address: osm_item.display_name,
+                        house_number: osm_item.address.house_number,
+                        street: osm_item.address.road,
+                        city: osm_item.address.city,
+                        postcode: osm_item.address.postcode,
+                    }),
                 });
             }
         </script>
