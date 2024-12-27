@@ -1,17 +1,16 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from starlette.responses import FileResponse
-from fastapi.responses import Response
-
-
-from datetime import datetime
-import shelve
 import hashlib
+import shelve
+from datetime import datetime
+from shelve import Shelf
+
+from fastapi import Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from pydantic import BaseModel
+from starlette.responses import FileResponse
+from typing_extensions import Annotated
 
-
-db = shelve.open("locations.db")
-
+DB_PATH: str = "locations.db"
 
 app = FastAPI()
 app.add_middleware(
@@ -21,6 +20,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+async def get_db():
+    db = shelve.open(DB_PATH)
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 class Location(BaseModel):
@@ -40,7 +47,7 @@ async def root():
 
 
 @app.post("/location")
-async def save_location(location: Location):
+async def save_location(location: Location, db: Annotated[Shelf, Depends(get_db)]):
     # Create hash from address
     addr_hash = hashlib.sha3_256(location.address.encode()).hexdigest()
     db[addr_hash] = location
@@ -48,7 +55,7 @@ async def save_location(location: Location):
 
 
 @app.get("/locations")
-async def get_locations():
+async def get_locations(db: Annotated[Shelf, Depends(get_db)]):
     csv_data = "street,house_number,plz,city,date\n"
     for loc in db.values():
         csv_data += (
@@ -60,3 +67,8 @@ async def get_locations():
         media_type="text/csv",
         headers={"Content-Disposition": "attachment; filename=locations.csv"},
     )
+
+
+@app.get("/debug")
+async def debug(db: Annotated[Shelf, Depends(get_db)]):
+    return db
