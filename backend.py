@@ -40,6 +40,7 @@ class Location(BaseModel):
     postcode: int
     city: str
     date: str = datetime.now().isoformat()
+    visited: bool = False
 
 
 @app.get("/")
@@ -79,6 +80,18 @@ async def submit_form(location: Location) -> bool:
     form_id = "211"
     share_hash = "eSAXf3aXTWW8wgxNFNG34wEJ"
     endpoint = f"/ocs/v2.php/apps/forms/api/v3/forms/{form_id}/submissions"
+
+    answer_keys = {
+        "lat": 634,
+        "lon": 635,
+        "city": 637,
+        "date": 638,
+        "street": 639,
+        "house_number": 640,
+        "plz": 641,
+        "visited": 642,
+        "visited_nextcloud_key": 643
+    }
     
     headers = {
         "Content-Type": "application/json",
@@ -89,18 +102,34 @@ async def submit_form(location: Location) -> bool:
     # Map location data to form field IDs
     payload = {
 	"answers": {
-		"634": [
-			location.lat # Latitude
+		answer_keys["lat"]: [
+			location.lat
 		],
-		"635": [
-			location.lon # Longitude
+		answer_keys["lon"]: [
+			location.lon
 		],
-		"636": [
-			"806" # Visited checked
-		]
+        answer_keys["city"]: [
+            location.city
+        ],
+        answer_keys["date"]: [
+            location.date
+        ],
+        answer_keys["street"]: [
+            location.street
+        ],
+        answer_keys["house_number"]: [
+            location.house_number
+        ],
+        answer_keys["plz"]: [
+            location.postcode 
+        ]
+
 	},
         "shareHash": share_hash
     }
+
+    if location.visited:
+        payload["answers"][answer_keys["visited"]] = answer_keys["visited_nextcloud_key"]
     
     try:
         async with httpx.AsyncClient() as client:
