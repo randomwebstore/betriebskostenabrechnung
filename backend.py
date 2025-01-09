@@ -38,7 +38,8 @@ class Location(BaseModel):
     house_number: str  # may contain letters
     postcode: int
     city: str
-    date: str = datetime.now().isoformat()
+    date: str | None = None
+    valid: bool = False
 
 
 @app.get("/")
@@ -50,17 +51,17 @@ async def root():
 async def save_location(location: Location, db: Annotated[Shelf, Depends(get_db)]):
     # Create hash from address
     addr_hash = hashlib.sha3_256(location.address.encode()).hexdigest()
-    db[addr_hash] = location
+    print(f"Saved location {location} with hash {addr_hash}")
+    location.date = datetime.now().isoformat()
+    db[addr_hash] = location.model_dump()
     return {"status": "success", "hash": addr_hash}
 
 
 @app.get("/locations")
 async def get_locations(db: Annotated[Shelf, Depends(get_db)]):
-    csv_data = "street,house_number,plz,city,date\n"
+    csv_data = "street,house_number,plz,city,date,valid\n"
     for loc in db.values():
-        csv_data += (
-            f"{loc.street},{loc.house_number},{loc.postcode},{loc.city},{loc.date}\n"
-        )
+        csv_data += f"{loc['street']},{loc['house_number']},{loc['postcode']},{loc['city']},{loc['date']},{loc['valid']}\n"
 
     return Response(
         content=csv_data,

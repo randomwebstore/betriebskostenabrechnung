@@ -177,6 +177,10 @@
                     },
                 });
 
+                add_location(false);
+            }
+
+            function add_location(valid) {
                 fetch("/location", {
                     method: "POST",
                     headers: {
@@ -190,6 +194,7 @@
                         street: osm_item.address.road,
                         city: osm_item.address.city || osm_item.address.village,
                         postcode: osm_item.address.postcode,
+                        valid: valid,
                     }),
                 });
             }
@@ -252,9 +257,18 @@
                     placeholder="Name Vermieter"
                 />
                 <input
+                    class="success-button"
+                    style="background: #28a745; width: 49%"
                     type="button"
-                    value="PDF Herunterladen"
+                    value="Fehlerhaft + PDF"
                     onclick="generate_pdf()"
+                />
+                <input
+                    class="danger-button"
+                    style="background: #dc3545; width: 49%"
+                    type="button"
+                    value="Korrekte Berechnung"
+                    onclick="add_location(true)"
                 />
             </form>
             <div
