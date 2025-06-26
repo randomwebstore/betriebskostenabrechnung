@@ -15,9 +15,9 @@ from typing_extensions import Annotated
 EVENT_ID: int = 8566
 DB_PATH: str = "locations.db"
 
-API_BASE = getenv("LINKE_API_BASE", "https://api.die-linke.app")
-REFERRER = getenv("LINKE_API_REFERRER", "https://web.die-linke.app/")
-CSRF_TOKEN_NAME = getenv("CSRF_TOKEN_NAME", "csrftoken")
+API_BASE = getenv("LINKE_API_BASE", "https://heizkosten.die-linke.app")
+REFERRER = getenv("LINKE_API_REFERRER", "https://heizkosten.die-linke.app/")
+CSRF_TOKEN_NAME = getenv("CSRF_TOKEN_NAME", "heizkosten-csrftoken")
 
 app = FastAPI()
 app.add_middleware(
