@@ -5,6 +5,9 @@ from os import getenv
 
 USERNAME = getenv("LINKE_USERNAME")
 PASSWORD = getenv("LINKE_PASSWORD")
+API_BASE = getenv("LINKE_API_BASE", "https://api.die-linke.app")
+REFERRER = getenv("LINKE_API_REFERRER", "https://web.die-linke.app/")
+CSRF_TOKEN_NAME = getenv("CSRF_TOKEN_NAME", "csrftoken")
 
 session = requests.Session()
 
@@ -13,7 +16,7 @@ events = [7970, 8023, 8456, 8269, 7662]
 
 def login():
     req = session.post(
-        "https://api.die-linke.app/api/v1/session/login/",
+        API_BASE + "/api/v1/session/login/",
         json={
             "identifier": USERNAME,
             "password": PASSWORD,
@@ -24,15 +27,15 @@ def login():
     return req.cookies.get_dict()
 
 
-csrftoken = login()["csrftoken"]
+csrftoken = login()[CSRF_TOKEN_NAME]
 
 
 def get_areas(event_id: int):
     req = session.get(
-        f"https://api.die-linke.app/api/v1/event-areas/?event={event_id}",
+        f"{API_BASE}/api/v1/event-areas/?event={event_id}",
         headers={
             "x-csrftoken": csrftoken,
-            "Referer": "https://web.die-linke.app/",
+            "Referer": REFERRER,
         },
     )
     req.raise_for_status()
@@ -41,10 +44,10 @@ def get_areas(event_id: int):
 
 def get_completion_notes(area_id: int):
     req = session.get(
-        f"https://api.die-linke.app/api/v1/completion-notes/?event_area={area_id}",
+        f"{API_BASE}/api/v1/completion-notes/?event_area={area_id}",
         headers={
             "x-csrftoken": csrftoken,
-            "Referer": "https://web.die-linke.app/",
+            "Referer": REFERRER,
         },
     )
     req.raise_for_status()
