@@ -5,9 +5,9 @@ from os import getenv
 
 USERNAME = getenv("LINKE_USERNAME")
 PASSWORD = getenv("LINKE_PASSWORD")
-API_BASE = getenv("LINKE_API_BASE", "https://api.die-linke.app")
-REFERRER = getenv("LINKE_API_REFERRER", "https://web.die-linke.app/")
-CSRF_TOKEN_NAME = getenv("CSRF_TOKEN_NAME", "csrftoken")
+API_BASE = getenv("LINKE_API_BASE", "https://heizkosten.die-linke.app")
+REFERRER = getenv("LINKE_API_REFERRER", "https://heizkosten.die-linke.app/")
+CSRF_TOKEN_NAME = getenv("CSRF_TOKEN_NAME", "heizkosten-csrftoken")
 
 session = requests.Session()
 
