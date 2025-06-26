@@ -15,6 +15,10 @@ from typing_extensions import Annotated
 EVENT_ID: int = 8566
 DB_PATH: str = "locations.db"
 
+API_BASE = getenv("LINKE_API_BASE", "https://api.die-linke.app")
+REFERRER = getenv("LINKE_API_REFERRER", "https://web.die-linke.app/")
+CSRF_TOKEN_NAME = getenv("CSRF_TOKEN_NAME", "csrftoken")
+
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -27,7 +31,7 @@ app.add_middleware(
 
 def login(session):
     req = session.post(
-        "https://api.die-linke.app/api/v1/session/login/",
+        API_BASE + "/api/v1/session/login/",
         json={
             "identifier": getenv("AKTIVISTI_USERNAME"),
             "password": getenv("AKTIVISTI_PASSWORD"),
@@ -35,7 +39,7 @@ def login(session):
         },
     )
     req.raise_for_status()
-    return req.cookies.get_dict()["csrftoken"]
+    return req.cookies.get_dict()[CSRF_TOKEN_NAME]
 
 
 async def get_db():
@@ -60,10 +64,10 @@ def add_location(
     address = f"{location['street']} {location['house_number']}, {location['postcode']} {location['city']}"
     session, csrftoken = get_session()
     session.post(
-        "https://api.die-linke.app/api/v1/posters/",
+        API_BASE + "/api/v1/posters/",
         headers={
             "x-csrftoken": csrftoken,
-            "Referer": "https://web.die-linke.app/",
+            "Referer": REFERRER,
         },
         json={
             "location_description": address,
