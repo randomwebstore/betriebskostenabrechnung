@@ -13,7 +13,7 @@ from starlette.responses import FileResponse
 from typing_extensions import Annotated
 
 EVENT_ID: int = 8566
-DB_PATH: str = "locations.db"
+DB_PATH: str = "db/locations.db"
 
 API_BASE = getenv("LINKE_API_BASE", "https://heizkosten.die-linke.app")
 REFERRER = getenv("LINKE_API_REFERRER", "https://heizkosten.die-linke.app/")
